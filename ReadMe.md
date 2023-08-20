@@ -1,5 +1,5 @@
 # NetNetFront
-A web browser inside your web browser, designed for 3DS and upward.
+A web browser inside your web browser, designed for the 3DS and upward.
 # Contributing
 Currently, I am only one person with a 3DS, WiiU, Nintendo Switch, and a very small budget.
 
