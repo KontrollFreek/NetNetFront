@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetNetFront</title>
+</head>
+<body>
+    <img>
+</body>
+<script>
+    window.onload = function () {
+        const xhrsession = new XMLHttpRequest()
+
+        xhrsession.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                var session = this.responseText
+
+                function page() {
+                    const xhrpage = new XMLHttpRequest()
+
+                    xhrpage.onreadystatechange = function () {
+                        var res = this.responseText
+                        if (this.readyState == 4) {
+                            var img = document.createElement('img')
+                            img.onload = function () {
+                                var element = document.getElementsByTagName('img')[0]
+                                element.src = 'data:image/jpeg;base64,' + res
+                                window.setTimeout(page, 100)
+                            }
+                            img.src = 'data:image/jpeg;base64,' + res
+                        }
+                    }
+
+                    xhrpage.open('GET', '/page/' + session, null)
+                    xhrpage.send(null)
+                }
+                page()
+            }
+        }
+
+        xhrsession.open('GET', '/session?width=' + window.innerWidth + '&height=' + window.innerHeight, null)
+        xhrsession.send(null)
+    }
+</script>
+<style>
+    body {
+        margin: 0px;
+        overflow: hidden;
+    }
+</style>
+</html>
