@@ -1,40 +1,32 @@
 (async function () {
     const compression = require('compression')
-    const puppeteer = require('puppeteer')
     const express = require('express')
     const app = express()
 
     app.use(compression())
 
-    const browser = await puppeteer.launch()
-    console.log('browser')
-
     const clients = {}
 
     app.get('/', (req, res) => res.sendFile(__dirname + '/html/index.html'))
 
-    app.get('/session', (req, res) => require('./session.js')(req, res, app, clients, browser))
-    app.get('/page/:auth', (req, res) => require('./page.js')(req, res, app, clients, browser))
+    app.get('/session', (req, res) => require('./session.js')(req, res, app, clients))
+    app.get('/page/:auth', (req, res) => require('./page.js')(req, res, app, clients))
 
-    // async function main() {
-        // const url = new URL('https://google.com')
+    setInterval(() => {
+        let c = Object.keys(clients)
+        c.forEach(c => {
+            if (clients[c].expire < Date.now()) {
+                clients[c].browser.close()
+                delete clients[c]
+            }
+        })
 
-        // const browser = await puppeteer.launch()
-        // const page = await browser.newPage()
-        // page.setViewport({ width: 1920, height: 1080 })
-        // await page.goto(url.href)
-        // console.log(url.href, 'accessed')
-        // async function update() {
-        //     let update = await page.screenshot({ encoding: "base64" })
-        //     console.log(update.length)
-        // }
-        // setInterval(update, 100)
-    // }
-    // main()
+        console.log(`[${new Date().toISOString()}] Removed stale clients`)
 
-    setInterval(() => console.log(clients), 5000)
+        console.log(`[${new Date().toISOString()}] ${Object.keys(clients).length} clients currently connected`)
+    }, 30000)
 
     app.all('*', (req, res) => res.sendStatus(404))
 
-    app.listen(8120, () => console.log('online'))
+    app.listen(8120, () => console.log(`[${new Date().toISOString()}] Server online`))
 })()
